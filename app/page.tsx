@@ -1,6 +1,7 @@
 "use client"
 import type React from "react"
 import { useState, useMemo, useCallback, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -695,6 +696,26 @@ export default function InstallationSchedule() {
   const [showTaskDetails, setShowTaskDetails] = useState<boolean>(false)
   const [scheduleStartDate, setScheduleStartDate] = useState<Date>(new Date())
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false)
+  
+  // Handle search params safely on client side
+  const searchParams = useSearchParams()
+  
+  // Initialize from URL params if available
+  useEffect(() => {
+    const locationParam = searchParams?.get('location')
+    const viewParam = searchParams?.get('view')
+    const weekParam = searchParams?.get('week')
+    
+    if (locationParam && locations.includes(locationParam as any)) {
+      setSelectedLocation(locationParam)
+    }
+    if (viewParam && (viewParam === 'grid' || viewParam === 'calendar')) {
+      setViewMode(viewParam as 'grid' | 'calendar')
+    }
+    if (weekParam && !isNaN(Number(weekParam))) {
+      setCurrentWeek(Math.max(0, Math.min(totalWeeks - 1, Number(weekParam))))
+    }
+  }, [searchParams, totalWeeks])
 
   const locations = ["all", "Bahir Dar", "Kombolcha", "Addis Ababa", "Travel"] as const
 
